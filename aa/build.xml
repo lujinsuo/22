@@ -1,31 +1,42 @@
 <?xml version="1.0"?>
 
-<project name="aa"  default="war" basedir=".">
-  <property name="classes"  value="build/classes"/>
-    <property name="build" value="build"/>
-    <property name="lib" value="WebContent/WEB-INF/lib"/>
-    <!-- 删除build路径-->
-    <target name="clean">
-       <delete dir="build"/>
-    </target>
+<project name="aa" default="war" basedir=".">
+	<property name="classes" value="build/classes" />
+	<property name="build" value="build" />
+	<property name="lib" value="WebContent/WEB-INF/lib" />
+	 <property name="webapp.name" value="aa" />  
+    <property name="catalina.home" value="E:\soft\tomcat\apache-tomcat-7.0.75-windows-x64\apache-tomcat-7.0.75" />  
+    <property name="dist.dir" value="${basedir}/build" />  
 
-    <!-- 建立build/classes路径，并编译class文件到build/classes路径下-->
-    <target name="compile" depends="clean">
-       <mkdir dir="${classes}"/>
+	<!-- 删除build路径 -->
+	<target name="clean">
+		<delete dir="build" />
+		<delete dir="${dist.dir}" />
+		<delete file="${catalina.home}/webapps/${webapp.name}.war" />
+		<delete dir="${catalina.home}/webapps/${webapp.name}" />
+	</target>
 
-       <javac srcdir="src" destdir="${classes}"/>
-    </target>
+	<!-- 建立build/classes路径，并编译class文件到build/classes路径下 -->
+	<target name="compile" depends="clean">
+		<mkdir dir="${classes}" />
 
-    <!-- 打war包-->
-    <target name="war" depends="compile">
-<war destfile="${build}/aa.war" >
-           <!-- 拷贝WebRoot下除了WEB-INF和META-INF的两个文件夹-->
-    <fileset dir="WebContent"  includes="**/*.jsp" />
+		<javac srcdir="src" destdir="${classes}" />
+	</target>
 
-           <!-- 拷贝lib目录下的jar包-->
-           <lib dir="${lib}"/>
-           <!-- 拷贝build/classes下的class文件-->
-          <classes dir="${classes}"/>
-       </war>
-    </target>
+	<!-- 打war包 -->
+	<target name="war" depends="compile">
+		<war destfile="${build}/aa.war" webxml="WebContent/WEB-INF/web.xml">
+			<!-- 拷贝WebRoot下除了WEB-INF和META-INF的两个文件夹 -->
+			<fileset dir="WebContent" includes="**/*.jsp" />
+			<!-- 拷贝lib目录下的jar包 -->
+			<lib dir="${lib}" />
+			<!-- 拷贝build/classes下的class文件 -->
+			<classes dir="${classes}" />
+		</war>
+	</target>
+	<target name="deploy" depends="war" description="部署项目">
+		<echo message="begin deploy..." />
+		<copy file="${dist.dir}/${webapp.name}.war" todir="${catalina.home}/webapps" />
+		<echo message="end deploy..." />
+	</target>
 </project>
